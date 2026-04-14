@@ -32,14 +32,7 @@ Jika Anda baru saja meng-clone repository proyek Laravel dan ingin menjalankan p
 
     Perintah ini akan mengeksekusi semua migrasi yang terkandung di proyek Laravel ini.
 
-7. **Run Seeds (Opsional):**
-   Proyek ini menggunakan _seeding_ untuk mengisi basis data awal, jalankan perintah berikut:
-
-    php artisan db:seed
-
-    Perintah ini akan menjalankan seeder yang telah didefinisikan.
-
-8. **Serve Aplikasi:**
+7. **Serve Aplikasi:**
    Setelah langkah-langkah di atas selesai, Anda dapat menjalankan server pengembangan Laravel untuk melihat proyek Anda:
 
     php artisan serve

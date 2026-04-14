@@ -46,4 +46,4 @@ Jika Anda baru saja meng-clone repository proyek Laravel dan ingin menjalankan p
 
     Aplikasi akan berjalan di http://localhost:8000 secara default.
 
-_Credit by: Yori Adi Atma_
+_Credit by: Kevin Ilham Syahreza AkA, ReZy_

@@ -2,7 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\Category;
+use App\Interfaces\CategoryRepositoryInterface;
+use App\Interfaces\MovieRepositoryInterface;
 use App\Models\Movie;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
@@ -15,43 +16,44 @@ use Illuminate\Validation\Rule;
 
 class MovieService
 {
+    private MovieRepositoryInterface $movieRepository;
+    private CategoryRepositoryInterface $categoryRepository;
     private OMDbService $omdbService;
 
-    public function __construct(OMDbService $omdbService)
+    public function __construct(
+        MovieRepositoryInterface $movieRepository,
+        CategoryRepositoryInterface $categoryRepository,
+        OMDbService $omdbService
+    )
     {
+        $this->movieRepository = $movieRepository;
+        $this->categoryRepository = $categoryRepository;
         $this->omdbService = $omdbService;
     }
 
     public function getHomepageMovies(?string $search): LengthAwarePaginator
     {
-        $query = Movie::latest();
-
-        if ($search) {
-            $query->where('judul', 'like', '%' . $search . '%')
-                ->orWhere('sinopsis', 'like', '%' . $search . '%');
-        }
-
-        return $query->paginate(6)->withQueryString();
+        return $this->movieRepository->getHomepagePaginated($search);
     }
 
     public function getWatchlistMovies(): LengthAwarePaginator
     {
-        return Movie::latest()->paginate(6);
+        return $this->movieRepository->getLatestPaginated(6);
     }
 
     public function getDataMovies(): LengthAwarePaginator
     {
-        return Movie::latest()->paginate(10);
+        return $this->movieRepository->getLatestPaginated(10);
     }
 
     public function findMovie(string $id): ?Movie
     {
-        return Movie::find($id);
+        return $this->movieRepository->findById($id);
     }
 
     public function getCategories(): Collection
     {
-        return Category::all();
+        return $this->categoryRepository->all();
     }
 
     public function store(Request $request): array
@@ -71,7 +73,7 @@ class MovieService
             $fotoSampul = $this->storeUploadedCover($request, 'jpg');
         }
 
-        Movie::create([
+        $this->movieRepository->create([
             'id' => $request->id,
             'judul' => $request->judul,
             'category_id' => $request->category_id,
@@ -107,7 +109,7 @@ class MovieService
             ];
         }
 
-        $movie = Movie::findOrFail($id);
+        $movie = $this->movieRepository->findByIdOrFail($id);
 
         if ($request->hasFile('foto_sampul')) {
             $extension = $request->file('foto_sampul')->getClientOriginalExtension();
@@ -115,7 +117,7 @@ class MovieService
 
             $this->deleteCoverIfExists($movie->foto_sampul);
 
-            $movie->update([
+            $this->movieRepository->update($movie, [
                 'judul' => $request->judul,
                 'sinopsis' => $request->sinopsis,
                 'category_id' => $request->category_id,
@@ -124,7 +126,7 @@ class MovieService
                 'foto_sampul' => $fileName,
             ]);
         } else {
-            $movie->update([
+            $this->movieRepository->update($movie, [
                 'judul' => $request->judul,
                 'sinopsis' => $request->sinopsis,
                 'category_id' => $request->category_id,
@@ -142,10 +144,10 @@ class MovieService
 
     public function delete(string $id): void
     {
-        $movie = Movie::findOrFail($id);
+        $movie = $this->movieRepository->findByIdOrFail($id);
 
         $this->deleteCoverIfExists($movie->foto_sampul);
-        $movie->delete();
+        $this->movieRepository->delete($movie);
     }
 
     public function searchFromOmdb(?string $query): array

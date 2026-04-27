@@ -68,35 +68,19 @@ class MovieService
             ];
         }
 
-        $fotoSampul = $request->input('poster_url');
+        $coverImage = $request->input('poster_url');
 
         if ($request->hasFile('foto_sampul')) {
-            $fotoSampul = $this->storeUploadedCover($request, 'jpg');
+            $coverImage = $this->storeUploadedCover($request, 'jpg');
         }
 
-        $this->movieRepository->create([
-            'id' => $request->id,
-            'judul' => $request->judul,
-            'category_id' => $request->category_id,
-            'sinopsis' => $request->sinopsis,
-            'tahun' => $request->tahun,
-            'pemain' => $request->pemain,
-            'foto_sampul' => $fotoSampul,
-        ]);
+        $this->movieRepository->create($this->buildMoviePayload($request, $coverImage));
 
         if ($request->has('poster_url')) {
-            return [
-                'success' => true,
-                'redirect' => '/watchlist',
-                'message' => 'Film berhasil ditambahkan ke Watchlist!',
-            ];
+            return $this->successResponse('/watchlist', 'Film berhasil ditambahkan ke Watchlist!');
         }
 
-        return [
-            'success' => true,
-            'redirect' => '/',
-            'message' => 'Data berhasil disimpan',
-        ];
+        return $this->successResponse('/', 'Data berhasil disimpan');
     }
 
     public function update(Request $request, string $id): array
@@ -112,35 +96,18 @@ class MovieService
 
         $movie = $this->movieRepository->findByIdOrFail($id);
 
+        $coverImage = null;
+
         if ($request->hasFile('foto_sampul')) {
             $extension = $request->file('foto_sampul')->getClientOriginalExtension();
-            $fileName = $this->storeUploadedCover($request, $extension);
+            $coverImage = $this->storeUploadedCover($request, $extension);
 
             $this->deleteCoverIfExists($movie->foto_sampul);
-
-            $this->movieRepository->update($movie, [
-                'judul' => $request->judul,
-                'sinopsis' => $request->sinopsis,
-                'category_id' => $request->category_id,
-                'tahun' => $request->tahun,
-                'pemain' => $request->pemain,
-                'foto_sampul' => $fileName,
-            ]);
-        } else {
-            $this->movieRepository->update($movie, [
-                'judul' => $request->judul,
-                'sinopsis' => $request->sinopsis,
-                'category_id' => $request->category_id,
-                'tahun' => $request->tahun,
-                'pemain' => $request->pemain,
-            ]);
         }
 
-        return [
-            'success' => true,
-            'redirect' => '/movies/data',
-            'message' => 'Data berhasil diperbarui',
-        ];
+        $this->movieRepository->update($movie, $this->buildMoviePayload($request, $coverImage, false));
+
+        return $this->successResponse('/movies/data', 'Data berhasil diperbarui');
     }
 
     public function delete(string $id): void
@@ -239,5 +206,35 @@ class MovieService
         if (File::exists($coverPath)) {
             File::delete($coverPath);
         }
+    }
+
+    private function buildMoviePayload(Request $request, ?string $coverImage = null, bool $includeId = true): array
+    {
+        $payload = [
+            'judul' => $request->judul,
+            'category_id' => $request->category_id,
+            'sinopsis' => $request->sinopsis,
+            'tahun' => $request->tahun,
+            'pemain' => $request->pemain,
+        ];
+
+        if ($includeId) {
+            $payload['id'] = $request->id;
+        }
+
+        if ($coverImage !== null) {
+            $payload['foto_sampul'] = $coverImage;
+        }
+
+        return $payload;
+    }
+
+    private function successResponse(string $redirect, string $message): array
+    {
+        return [
+            'success' => true,
+            'redirect' => $redirect,
+            'message' => $message,
+        ];
     }
 }

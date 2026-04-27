@@ -31,5 +31,8 @@ jobs:
           echo DB_CONNECTION=sqlite >> .env
           echo DB_DATABASE=database/database.sqlite >> .env
 
+      - name: Run migrations
+        run: php artisan migrate --force
+
       - name: Run tests
         run: php artisan test

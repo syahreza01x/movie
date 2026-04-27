@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Movie;
 
-use App\Interfaces\CategoryRepositoryInterface;
-use App\Interfaces\MovieRepositoryInterface;
+use App\Interfaces\Repositories\CategoryRepositoryInterface;
+use App\Interfaces\Repositories\MovieRepositoryInterface;
 use App\Models\Movie;
+use App\Services\External\OMDbService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Database\Eloquent\Collection;

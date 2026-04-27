@@ -2,10 +2,10 @@
 
 namespace App\Providers;
 
-use App\Interfaces\CategoryRepositoryInterface;
-use App\Interfaces\MovieRepositoryInterface;
-use App\Repositories\EloquentCategoryRepository;
-use App\Repositories\EloquentMovieRepository;
+use App\Interfaces\Repositories\CategoryRepositoryInterface;
+use App\Interfaces\Repositories\MovieRepositoryInterface;
+use App\Repositories\Eloquent\EloquentCategoryRepository;
+use App\Repositories\Eloquent\EloquentMovieRepository;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
 

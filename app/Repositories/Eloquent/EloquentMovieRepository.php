@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Eloquent;
 
-use App\Interfaces\MovieRepositoryInterface;
+use App\Interfaces\Repositories\MovieRepositoryInterface;
 use App\Models\Movie;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\External;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class OMDbService
 {
@@ -29,7 +30,7 @@ class OMDbService
 
             if ($response->successful()) {
                 $data = $response->json();
-                
+
                 if ($data['Response'] === 'True') {
                     return [
                         'judul' => $data['Title'] ?? '',
@@ -44,7 +45,7 @@ class OMDbService
 
             return null;
         } catch (\Exception $e) {
-            \Log::error('OMDb API Error: ' . $e->getMessage());
+            Log::error('OMDb API Error: ' . $e->getMessage());
             return null;
         }
     }
@@ -63,7 +64,7 @@ class OMDbService
 
             if ($response->successful()) {
                 $data = $response->json();
-                
+
                 if ($data['Response'] === 'True' && isset($data['Search'])) {
                     return array_map(function ($movie) {
                         return [
@@ -79,7 +80,7 @@ class OMDbService
 
             return [];
         } catch (\Exception $e) {
-            \Log::error('OMDb Search Error: ' . $e->getMessage());
+            Log::error('OMDb Search Error: ' . $e->getMessage());
             return [];
         }
     }
@@ -98,7 +99,7 @@ class OMDbService
 
             if ($response->successful()) {
                 $data = $response->json();
-                
+
                 if ($data['Response'] === 'True') {
                     return [
                         'imdbid' => $data['imdbID'] ?? '',
@@ -116,7 +117,7 @@ class OMDbService
 
             return null;
         } catch (\Exception $e) {
-            \Log::error('OMDb Detail Error: ' . $e->getMessage());
+            Log::error('OMDb Detail Error: ' . $e->getMessage());
             return null;
         }
     }
@@ -139,7 +140,7 @@ class OMDbService
 
             return 'default.jpg';
         } catch (\Exception $e) {
-            \Log::error('OMDb Poster Error: ' . $e->getMessage());
+            Log::error('OMDb Poster Error: ' . $e->getMessage());
             return 'default.jpg';
         }
     }

@@ -35,8 +35,12 @@
 			</div>
             <div class="mb-3">
                 <label for="foto" class="form-label">Foto Sebelumnya:</label>
-                <img src="{{ strpos($movie['foto_sampul'], 'http') === 0 ? $movie['foto_sampul'] : '/images/' . $movie['foto_sampul'] }}" class="img-thumbnail"
-                alt="{{ $movie['judul'] }}" width="100px">
+				@include('movies.partials.poster-image', [
+					'movie' => $movie,
+					'class' => 'img-thumbnail',
+					'alt' => $movie['judul'],
+					'width' => '100px',
+				])
             </div>
 			<div class="mb-3">
 				<label for="foto_sampul" class="form-label">Foto Sampul:</label>

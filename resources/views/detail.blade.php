@@ -7,7 +7,11 @@
 <div class="card mb-3">
     <div class="row g-0">
       <div class="col-md-3">
-        <img src="{{ strpos($movie['foto_sampul'], 'http') === 0 ? $movie['foto_sampul'] : '/images/' . $movie['foto_sampul'] }}" class="img-fluid rounded-start" alt="{{ $movie['judul'] }}">
+        @include('movies.partials.poster-image', [
+            'movie' => $movie,
+            'class' => 'img-fluid rounded-start',
+            'alt' => $movie['judul'],
+        ])
       </div>
       <div class="col-md-9">
         <div class="card-body">

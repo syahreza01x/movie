@@ -49,6 +49,9 @@
     </div>
 </div>
 
+@endsection
+
+@push('styles')
 <style>
     .movie-card {
         cursor: pointer;
@@ -56,17 +59,21 @@
         border: none;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
+
     .movie-card:hover {
         transform: translateY(-8px);
         box-shadow: 0 8px 16px rgba(0,0,0,0.2);
     }
+
     .movie-poster {
         height: 350px;
         object-fit: cover;
         background: #f0f0f0;
     }
 </style>
+@endpush
 
+@push('scripts')
 <script>
 document.getElementById('search-btn').addEventListener('click', searchMovies);
 document.getElementById('search-input').addEventListener('keypress', function(e) {
@@ -171,5 +178,4 @@ window.addEventListener('load', function() {
     }
 });
 </script>
-
-@endsection
+@endpush

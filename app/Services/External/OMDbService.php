@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\External;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class OMDbService
 {
-    private $apiKey;
-    private $baseUrl = 'http://www.omdbapi.com/';
-    private $imageUrl = 'http://img.omdbapi.com/';
+    private string $apiKey;
+    private string $baseUrl = 'http://www.omdbapi.com/';
 
     public function __construct()
     {
@@ -16,43 +16,9 @@ class OMDbService
     }
 
     /**
-     * Search movies by title
-     */
-    public function searchByTitle($title)
-    {
-        try {
-            $response = Http::get($this->baseUrl, [
-                'apikey' => $this->apiKey,
-                't' => $title,
-                'type' => 'movie'
-            ]);
-
-            if ($response->successful()) {
-                $data = $response->json();
-                
-                if ($data['Response'] === 'True') {
-                    return [
-                        'judul' => $data['Title'] ?? '',
-                        'sinopsis' => $data['Plot'] ?? '',
-                        'tahun' => (int)($data['Year'] ?? date('Y')),
-                        'pemain' => $data['Actors'] ?? '',
-                        'imdbid' => $data['imdbID'] ?? '',
-                        'poster' => $data['Poster'] !== 'N/A' ? $data['Poster'] : 'default.jpg',
-                    ];
-                }
-            }
-
-            return null;
-        } catch (\Exception $e) {
-            \Log::error('OMDb API Error: ' . $e->getMessage());
-            return null;
-        }
-    }
-
-    /**
      * Search movies - return multiple results
      */
-    public function searchMovies($title)
+    public function searchMovies(string $title): array
     {
         try {
             $response = Http::get($this->baseUrl, [
@@ -63,7 +29,7 @@ class OMDbService
 
             if ($response->successful()) {
                 $data = $response->json();
-                
+
                 if ($data['Response'] === 'True' && isset($data['Search'])) {
                     return array_map(function ($movie) {
                         return [
@@ -79,7 +45,7 @@ class OMDbService
 
             return [];
         } catch (\Exception $e) {
-            \Log::error('OMDb Search Error: ' . $e->getMessage());
+            Log::error('OMDb Search Error: ' . $e->getMessage());
             return [];
         }
     }
@@ -87,7 +53,7 @@ class OMDbService
     /**
      * Get movie details by IMDB ID
      */
-    public function getMovieById($imdbId)
+    public function getMovieById(string $imdbId): ?array
     {
         try {
             $response = Http::get($this->baseUrl, [
@@ -98,7 +64,7 @@ class OMDbService
 
             if ($response->successful()) {
                 $data = $response->json();
-                
+
                 if ($data['Response'] === 'True') {
                     return [
                         'imdbid' => $data['imdbID'] ?? '',
@@ -116,31 +82,8 @@ class OMDbService
 
             return null;
         } catch (\Exception $e) {
-            \Log::error('OMDb Detail Error: ' . $e->getMessage());
+            Log::error('OMDb Detail Error: ' . $e->getMessage());
             return null;
-        }
-    }
-
-    /**
-     * Get poster image download link
-     */
-    public function getPosterUrl($title)
-    {
-        try {
-            $response = Http::get($this->imageUrl, [
-                'apikey' => $this->apiKey,
-                't' => $title,
-                'type' => 'movie'
-            ]);
-
-            if ($response->successful() && $response->headers()['content-type'][0] === 'image/jpeg') {
-                return $this->imageUrl . '?apikey=' . $this->apiKey . '&t=' . urlencode($title);
-            }
-
-            return 'default.jpg';
-        } catch (\Exception $e) {
-            \Log::error('OMDb Poster Error: ' . $e->getMessage());
-            return 'default.jpg';
         }
     }
 }
